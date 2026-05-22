@@ -1,6 +1,6 @@
 {
   "name": "pal-mem",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Palace Agent Layer — local-first, markdown-native memory for AI agents.",
   "license": "MIT",
   "homepage": "https://github.com/kairosomatic/PAL-MEM",
