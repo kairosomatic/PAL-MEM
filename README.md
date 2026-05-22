@@ -31,16 +31,16 @@ Palace solves all three with one local store:
 
 ## How Palace compares
 
-| | **Palace** | **Mem0** | **Letta** | **Zep** | **Vanilla vector-RAG** |
-|---|---|---|---|---|---|
-| **Retention model** | Frontier-distilled records — cognitive work preserved, not raw chunks | Extracted facts + relationships (graph + vector) | Agent state management + vector storage | Bi-temporal episodic memory, fact extraction | Raw embedded chunks |
-| **Trust / AI SBOM** | Per-record frontmatter: trust level, source, redacted secrets, injection-pattern audit, abstract model | None | None | None | None |
-| **Prompt-injection firewall** | `detectInjection()` at write time — 10 patterns, flags and quarantines hits | None | None | None | None |
-| **Retrieval** | Hybrid: cosine + keyword lemma + recency + usage heat | Vector + graph traversal | In-context + vector | Temporal-aware vector | Pure cosine similarity |
-| **Deployment** | Local-only, no account, no phone-home, `~/.palace` on disk | Hosted API or self-hosted | Hosted API or self-hosted | Hosted API or self-hosted | Wherever you run the vector DB |
-| **Human inspectability** | `grep`, `ls`, `cat` — same files the agent retrieved | Dashboard / API | Dashboard / API | Dashboard / API | Whatever the DB UI exposes |
+| | **Palace** | **Mem0** | **Letta** | **Zep** | **Cognee** | **Graphiti** | **Vanilla vector-RAG** |
+|---|---|---|---|---|---|---|---|
+| **Retention model** | Frontier-distilled records — cognitive work preserved, not raw chunks | Extracted facts + relationships (graph + vector) | Agent state management + vector storage | Bi-temporal episodic memory, fact extraction | ECL pipeline — knowledge graph over entities and relationships | Temporal knowledge graph — facts with validity windows | Raw embedded chunks |
+| **Trust / AI SBOM** | Per-record frontmatter: trust level, source, redacted secrets, injection-pattern audit, abstract model | None | None | None | None | None | None |
+| **Prompt-injection firewall** | `detectInjection()` at write time — 10 patterns, flags and quarantines hits | None | None | None | None | None | None |
+| **Retrieval** | Hybrid: cosine + keyword lemma + recency + usage heat | Vector + graph traversal | In-context + vector | Temporal-aware vector | Graph traversal + vector | Temporal graph traversal | Pure cosine similarity |
+| **Deployment** | Local-only, no account, no phone-home, `~/.palace` on disk | Hosted API or self-hosted | Hosted API or self-hosted | Hosted API or self-hosted | Self-hosted or cloud | Self-hosted or cloud | Wherever you run the vector DB |
+| **Human inspectability** | `grep`, `ls`, `cat` — same files the agent retrieved | Dashboard / API | Dashboard / API | Dashboard / API | Dashboard / API | Dashboard / API | Whatever the DB UI exposes |
 
-The row where Palace is unique is **human inspectability combined with trust frontmatter**. Every other tool optimizes for the agent's retrieval path; Palace optimizes for the operator's audit path at the same time. When the agent surfaces a record, the operator can `cat` the same file and verify. No dashboard, no API call — the source of truth is a text file.
+The row where Palace is unique is **trust frontmatter + human inspectability, combined**. Every other tool optimizes for the agent's retrieval path; Palace optimizes for the operator's audit path at the same time. When the agent surfaces a record, the operator can `cat` the same file and verify. No dashboard, no API call — the source of truth is a text file. Cognee (17.5k stars, in production at 70+ companies) and Graphiti (20k+ stars, powers Zep v3) are the strongest comparisons in the graph-memory space — neither has a trust model or injection audit.
 
 ---
 
@@ -298,6 +298,7 @@ MIT. See [`LICENSE`](./LICENSE).
 - Eval methodology and results — `docs/evals/` (audited subset of the showcase grid, public-corpus only)
 - Architecture: `ARCHITECTURE.md` (in progress)
 - Issue tracker: GitHub (link on package release)
+- Hermes integration (agent-ingestible): [`docs/integrations/hermes.md`](./docs/integrations/hermes.md)
 - GitHub topics (set on the public repo): `pal-mem`, `mcp`, `model-context-protocol`, `claude`, `claude-code`, `agent-memory`, `agentic-rag`, `prompt-injection`, `ai-security`, `ai-sbom`, `context-filter`, `local-first`, `markdown`, `cdlc`, `retrieval`, `vector-search`
 
 ---
