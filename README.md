@@ -82,6 +82,22 @@ What you can do:
 
 If your memory is already in plain text or markdown: easiest path. Add YAML frontmatter to each file and drop into `~/.palace/wings/<wing>/<hall>/`. Palace reads any `.md` file with valid frontmatter.
 
+**You do not have to move your files.** If you want to keep them at their current location, point Palace at that root instead of moving everything:
+
+```json
+{ "wingsPath": "/path/to/your/existing/notes" }
+```
+
+Save that to `~/.palace/config.json`. Alternatively, symlink your existing directory:
+
+```bash
+ln -s /path/to/your/existing/notes ~/.palace/wings
+```
+
+Embeddings are computed lazily on first retrieval or explicitly via `palace bootstrap`. They are stored as sidecar files alongside your records — your source files are never modified.
+
+**One structural constraint:** Palace expects exactly two levels of subdirectory under `wingsPath`: `<wing>/<hall>/record.md`. Files nested deeper (e.g. `wing/hall/subfolder/record.md`) are ignored by the retrieval engine. If your existing system uses deeper nesting, flatten to two levels or use the top two levels as wing/hall and let deeper paths collapse.
+
 Minimum valid frontmatter:
 ```yaml
 ---
