@@ -362,8 +362,8 @@ async function main() {
     }
 
     case 'archive': {
-      const { execSync } = require('child_process');
-      execSync(`bash "${path.join(PALACE_HOME, 'scripts', 'archive.sh')}"`, { stdio: 'inherit' });
+      const { execFileSync } = require('child_process');
+      execFileSync('bash', [path.join(PALACE_HOME, 'scripts', 'archive.sh')], { stdio: 'inherit' });
       break;
     }
 

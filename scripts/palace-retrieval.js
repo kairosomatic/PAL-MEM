@@ -31,6 +31,7 @@ const natural  = require('natural');
 const access   = require('./palace-access.js');
 const trust    = require('./palace-trust.js');
 const paths    = require('./palace-paths.js');
+const config   = require('./palace-config.js');
 
 const PALACE_HOME = process.env.PALACE_HOME || path.join(process.env.HOME, '.palace');
 const PUBLISHED_DIR  = paths.ROOTS.published;
@@ -50,17 +51,18 @@ const STOP_WORDS = new Set([
 
 const stemmer = natural.PorterStemmer;
 
-const TYPE_MAP = [
-  { match: /^cardshop\/operations$/,            type: 'episodic'   },
-  { match: /^cardshop\//,                       type: 'project'    },
-  { match: /^discord\/(council|daily)/,         type: 'session'    },
-  { match: /^axel\/diary/,                      type: 'session'    },
+// Framework-default wing/hall → MemoryType mapping. Operators add their own
+// mappings via ~/.palace/config.json `typeMap` (see palace-config.js); config
+// entries are matched first, then these defaults.
+const DEFAULT_TYPE_MAP = [
   { match: /^research\//,                       type: 'procedural' },
   { match: /^qa-library\//,                     type: 'procedural' },
-  { match: /^ai-stack\//,                       type: 'entity'     },
-  { match: /^nexus\//,                          type: 'episodic'   },
   { match: /^meta\//,                           type: 'project'    },
 ];
+
+function getTypeMap() {
+  return config.typeMap().concat(DEFAULT_TYPE_MAP);
+}
 
 let CORPUS = [];          // [{ id, wing, hall, file, fullPath, meta, body, keywords, vec, updated, type }]
 let LOADED_AT = 0;
@@ -114,7 +116,7 @@ function parseFrontmatter(text) {
 
 function inferType(wing, hall) {
   const key = `${wing}/${hall}`;
-  for (const rule of TYPE_MAP) {
+  for (const rule of getTypeMap()) {
     if (rule.match.test(key)) return rule.type;
   }
   return 'episodic';
@@ -153,7 +155,7 @@ function loadTree(rootDir, pathVisibility) {
   // Walk wings/<wing>/<hall>/<id>.md under the given root.
   // Tag each record with its path-implied visibility, but verify per-record
   // via defaultVisibility() — if frontmatter and path disagree, we skip the
-  // record and warn to stderr (Kairos: pre-read enforcement closes the
+  // record and warn to stderr (pre-read enforcement closes the
   // store/doctor window for path drift).
   const out = [];
   if (!fs.existsSync(rootDir)) return out;
@@ -399,9 +401,16 @@ async function bootstrap(opts = {}) {
   const since     = opts.since ? new Date(opts.since).getTime() : null;
 
   // Project-scoped filter: include only records whose wing matches project,
-  // unless project is null (cross-project bootstrap).
-  const projectMatch = (r) => !project || r.wing === project ||
-    (project === 'cardshop' && (r.wing === 'cardshop' || r.wing === 'meta'));
+  // unless project is null (cross-project bootstrap). Operators can extend
+  // the projection (e.g. always include "meta" alongside a given project)
+  // via ~/.palace/config.json `crossWingProjects`.
+  const crossWings = config.crossWingProjects();
+  const projectMatch = (r) => {
+    if (!project) return true;
+    if (r.wing === project) return true;
+    const extra = crossWings[project];
+    return Array.isArray(extra) && extra.includes(r.wing);
+  };
 
   const inWindow = (r) => !since || (r.updated && new Date(r.updated).getTime() >= since);
 

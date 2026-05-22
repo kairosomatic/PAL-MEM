@@ -10,6 +10,7 @@
 //   node palace-api.js summary [limit]
 
 const palace = require('./palace.js');
+const config = require('./scripts/palace-config.js');
 const [,, cmd, ...args] = process.argv;
 
 (async () => {
@@ -19,7 +20,8 @@ const [,, cmd, ...args] = process.argv;
       result = await palace.search(args.join(' '), { limit: 5 });
     } else if (cmd === 'store') {
       const [wing, hall, ...bodyParts] = args;
-      result = await palace.store(wing, hall, bodyParts.join(' '), ['telegram', 'diary'], {
+      const tags = config.defaultTags();
+      result = await palace.store(wing, hall, bodyParts.join(' '), tags, {
         trust:  'medium',
         source: 'local-human',
       });

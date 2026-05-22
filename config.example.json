@@ -1,0 +1,19 @@
+{
+  "_comment": "Copy to ~/.palace/config.json and edit. Gitignored. See scripts/palace-config.js for the full key list.",
+
+  "trustedSourcePrefixes": [
+    "script:myproject-"
+  ],
+
+  "typeMap": [
+    { "pattern": "^myproject/operations$", "type": "episodic" },
+    { "pattern": "^myproject/",            "type": "project"  },
+    { "pattern": "^diary/",                "type": "session"  }
+  ],
+
+  "crossWingProjects": {
+    "myproject": ["myproject", "meta"]
+  },
+
+  "defaultTags": []
+}

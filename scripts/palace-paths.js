@@ -10,9 +10,10 @@
  * Spec: ideas/Hw/pal-trust-default-visibility-v2.1-spec.md §2
  */
 
-const os   = require('os');
-const fs   = require('fs');
-const path = require('path');
+const os     = require('os');
+const fs     = require('fs');
+const path   = require('path');
+const config = require('./palace-config.js');
 
 const PALACE_HOME = process.env.PALACE_HOME || path.join(os.homedir(), '.palace');
 
@@ -28,18 +29,20 @@ const EXPOSURE_AUDIT   = path.join(INDEX_DIR, 'exposure-audit.jsonl');
 const CONTENT_ACCESS   = path.join(INDEX_DIR, 'content-access.jsonl');
 const WRITE_LOCK       = path.join(PALACE_HOME, '.lock');
 
+// Framework-essential trusted-source prefixes. Operators add more via
+// ~/.palace/config.json `trustedSourcePrefixes` (see palace-config.js).
 const TRUSTED_SOURCE_PREFIXES = [
   'local-human',
   'claude-code:',
   'cowork:',
-  'legacy-local',          // stamped by `palace migrate` on this corpus
-  'script:cardshop-',      // operator-declared cardshop scripts
+  'legacy-local',          // stamped by `palace migrate` on local corpora
 ];
 
 function isTrustedSource(source) {
   if (!source) return false;
   const s = String(source);
-  return TRUSTED_SOURCE_PREFIXES.some(p =>
+  const all = TRUSTED_SOURCE_PREFIXES.concat(config.trustedSourcePrefixes());
+  return all.some(p =>
     p.endsWith(':') || p.endsWith('-') ? s.startsWith(p) : s === p
   );
 }
@@ -145,6 +148,47 @@ function writeAtomic(filePath, content) {
 }
 
 /**
+ * Validates a single path segment (wing, hall, or id) before it joins a root.
+ *
+ * Why: `pathForRecord` and every other write helper builds an absolute path
+ * by `path.join(root, wing, hall, id+'.md')`. If `wing` contains `..` or a
+ * slash, `path.join` will happily escape the root — the MCP write tools
+ * (`palace_remember`, `palace_forget`) accept wing/hall from untrusted
+ * callers, and frontmatter `wing:`/`hall:` on quarantined records is also
+ * caller-controlled. Reject anything that could escape the segment.
+ *
+ * Rules:
+ *   - non-empty string, ≤64 chars
+ *   - no `/`, `\`, or null byte (segment separators)
+ *   - no `..` anywhere (parent-dir escape)
+ *   - cannot start with `.` (hidden dirs and `./`/`../` prefixes)
+ *   - allowed chars: letters, digits, `_`, `-`, `.`
+ */
+const SEGMENT_RE = /^[A-Za-z0-9_\-.]+$/;
+const SEGMENT_MAX = 64;
+
+function assertSafeSegment(value, label) {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`palace-paths: ${label} must be a non-empty string`);
+  }
+  if (value.length > SEGMENT_MAX) {
+    throw new Error(`palace-paths: ${label} exceeds ${SEGMENT_MAX} chars`);
+  }
+  if (value.includes('/') || value.includes('\\') || value.includes('\0')) {
+    throw new Error(`palace-paths: ${label} contains a path separator`);
+  }
+  if (value === '..' || value === '.' || value.includes('..')) {
+    throw new Error(`palace-paths: ${label} contains parent-dir escape`);
+  }
+  if (value.startsWith('.')) {
+    throw new Error(`palace-paths: ${label} cannot start with '.'`);
+  }
+  if (!SEGMENT_RE.test(value)) {
+    throw new Error(`palace-paths: ${label} contains disallowed characters`);
+  }
+}
+
+/**
  * pathForRecord(record) → absolute file path under the correct root.
  * Caller still mkdirs the parent and writes via the atomic temp+rename pattern.
  */
@@ -152,6 +196,9 @@ function pathForRecord(record) {
   if (!record.id || !record.wing || !record.hall) {
     throw new Error('pathForRecord: record needs id, wing, hall');
   }
+  assertSafeSegment(record.wing, 'wing');
+  assertSafeSegment(record.hall, 'hall');
+  assertSafeSegment(record.id,   'id');
   const root = record.archived ? archiveRootForRecord(record) : rootForRecord(record);
   return path.join(root, record.wing, record.hall, `${record.id}.md`);
 }
@@ -170,6 +217,7 @@ module.exports = {
   rootForRecord,
   archiveRootForRecord,
   pathForRecord,
+  assertSafeSegment,
   withWriteLock,
   writeAtomic,
 };

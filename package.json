@@ -1,7 +1,23 @@
 {
+  "name": "pal-mem",
+  "version": "0.1.0",
+  "description": "Palace Agent Layer — local-first, markdown-native memory for AI agents.",
+  "license": "MIT",
+  "homepage": "https://github.com/kairosomatic/PAL-MEM",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kairosomatic/PAL-MEM.git"
+  },
+  "bin": {
+    "palace": "./palace-cli.js"
+  },
+  "main": "./palace.js",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "js-yaml": "^4.1.1",
-    "natural": "^8.1.1"
+    "natural": "^8.1.1",
+    "zod": "^3.23.0"
   }
 }

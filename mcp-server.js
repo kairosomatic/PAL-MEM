@@ -58,7 +58,7 @@ server.registerTool(
       'project records, recent sessions, recent episodics, relevant procedurals, and entities. ' +
       'Returns abstracts (~200 tokens each) bounded by maxTokens. Drops, never truncates.',
     inputSchema: {
-      project:           z.string().optional().describe('Project name (typically the wing — e.g., "cardshop")'),
+      project:           z.string().optional().describe('Project name (typically the wing — e.g., "myproject")'),
       branch:            z.string().optional().describe('Git branch — used to rank procedurals by relevance'),
       maxTokens:         z.number().int().positive().optional().describe('Token budget (default 2000)'),
       since:             z.string().optional().describe('ISO date — only include records updated since'),
@@ -92,7 +92,7 @@ server.registerTool(
       k:     z.number().int().positive().optional().describe('Number of results (default 5)'),
       types: z.array(z.enum(['project', 'session', 'entity', 'procedural', 'episodic'])).optional()
               .describe('Restrict to specific memory types'),
-      wing:  z.string().optional().describe('Restrict to a specific wing (e.g., "cardshop")'),
+      wing:  z.string().optional().describe('Restrict to a specific wing (e.g., "myproject")'),
       hall:  z.string().optional().describe('Restrict to a specific hall'),
       since: z.string().optional().describe('ISO date — only include records updated since'),
       mode:  z.enum(['semantic', 'keyword', 'hybrid']).optional().describe('Default hybrid'),
@@ -161,8 +161,8 @@ server.registerTool(
       'prompt-injection patterns auto-flag review_required, low-trust records are excluded from ' +
       'bootstrap by default, ephemeral records auto-archive after ttlDays.',
     inputSchema: {
-      wing:      z.string().describe('Wing (top-level project namespace, e.g., "cardshop", "axel", "research")'),
-      hall:      z.string().describe('Hall (sub-namespace, e.g., "operations", "diary", "harness-engineering-notes")'),
+      wing:      z.string().describe('Wing (top-level project namespace, e.g., "myproject", "diary", "research")'),
+      hall:      z.string().describe('Hall (sub-namespace, e.g., "operations", "notes", "engineering")'),
       body:      z.string().min(20).describe('Self-contained prose. Lead with what + why; include key entities/files/decisions.'),
       tags:      z.array(z.string()).optional().describe('Free-form tags for filtering'),
       trust:     z.enum(['high', 'medium', 'low']).optional().describe('Trust level. Default high. Use "low" for any record sourced from untrusted input (email, scraped web, third-party).'),

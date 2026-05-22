@@ -130,9 +130,9 @@ node ~/.palace/palace-api.js summary 10
 All Hermes memories are plain markdown on disk:
 
 ```bash
-ls ~/.palace/wings/          # list wings (topic areas)
-ls ~/.palace/wings/axel/     # list halls under a wing
-cat ~/.palace/wings/axel/diary/r-<id>.md   # read a specific record
+ls ~/.palace/wings/                # list wings (topic areas)
+ls ~/.palace/wings/<wing>/         # list halls under a wing
+cat ~/.palace/wings/<wing>/<hall>/r-<id>.md   # read a specific record
 ```
 
 Records flagged for review (injection pattern hit or low-trust source) land in:

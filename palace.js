@@ -134,6 +134,8 @@ function updateIndex(wing, hall, id, tags) {
 // ── Public API ───────────────────────────────────────────────────────────────
 
 function isDuplicate(wing, hall, body) {
+  paths.assertSafeSegment(wing, 'wing');
+  paths.assertSafeSegment(hall, 'hall');
   const hallDir = path.join(PALACE_HOME, 'wings', wing, hall);
   if (!fs.existsSync(hallDir)) return false;
   const prefix = body.slice(0, 80).toLowerCase();
@@ -145,6 +147,11 @@ function isDuplicate(wing, hall, body) {
 }
 
 async function store(wing, hall, body, tags = [], opts = {}) {
+  // Validate wing/hall before any disk touch — closes path-traversal class
+  // for the MCP write surface and any other untrusted caller.
+  paths.assertSafeSegment(wing, 'wing');
+  paths.assertSafeSegment(hall, 'hall');
+
   // ── v2.1 trust pipeline — no silent fallbacks ──
   const trustLevel = trust.normalizeTrust(opts.trust);   // null if missing/invalid → quarantines
   const source     = opts.source || null;                 // null if missing → quarantines
@@ -218,6 +225,8 @@ async function store(wing, hall, body, tags = [], opts = {}) {
 }
 
 async function recall(wing, hall, { limit = 10 } = {}) {
+  paths.assertSafeSegment(wing, 'wing');
+  paths.assertSafeSegment(hall, 'hall');
   const hallDir = path.join(PALACE_HOME, 'wings', wing, hall);
   if (!fs.existsSync(hallDir)) return [];
 
@@ -235,6 +244,7 @@ async function recall(wing, hall, { limit = 10 } = {}) {
 }
 
 async function search(query, { wings = [], includeSessions = false } = {}) {
+  for (const w of wings) paths.assertSafeSegment(w, 'wing');
   const terms       = query.toLowerCase().split(/\s+/).filter(Boolean);
   const searchWings = wings.length ? wings : getAllWings();
   const results     = [];
@@ -323,6 +333,9 @@ async function summary(limit = 20) {
 }
 
 function updateRoom(wing, hall, id, { body, tags } = {}) {
+  paths.assertSafeSegment(wing, 'wing');
+  paths.assertSafeSegment(hall, 'hall');
+  paths.assertSafeSegment(id,   'id');
   const filePath = roomPath(wing, hall, id);
   if (!fs.existsSync(filePath)) return null;
 
@@ -379,6 +392,9 @@ function updateRoom(wing, hall, id, { body, tags } = {}) {
 }
 
 async function getRoom(wing, hall, id) {
+  paths.assertSafeSegment(wing, 'wing');
+  paths.assertSafeSegment(hall, 'hall');
+  paths.assertSafeSegment(id,   'id');
   const filePath = roomPath(wing, hall, id);
   if (!fs.existsSync(filePath)) return null;
   return parseRoom(fs.readFileSync(filePath, 'utf8'));
