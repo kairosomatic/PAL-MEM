@@ -117,6 +117,7 @@ source: operator
 ```bash
 git clone https://github.com/kairosomatic/PAL-MEM ~/.palace
 cd ~/.palace && npm install
+echo 'export PATH="$HOME/.palace:$PATH"' >> ~/.zshrc && source ~/.zshrc
 claude mcp add palace ~/.palace/mcp-server.js
 palace bootstrap --json
 ```
@@ -127,11 +128,13 @@ palace bootstrap --json
 git clone https://github.com/kairosomatic/PAL-MEM /your/path
 export PALACE_HOME=/your/path
 cd $PALACE_HOME && npm install
+echo "export PALACE_HOME=$PALACE_HOME" >> ~/.zshrc
+echo 'export PATH="$PALACE_HOME:$PATH"' >> ~/.zshrc && source ~/.zshrc
 claude mcp add palace $PALACE_HOME/mcp-server.js
 palace bootstrap --json
 ```
 
-Add the `export` to your shell profile (`~/.zshrc` or `~/.bashrc`) to make it permanent.
+Add both exports to your shell profile (`~/.zshrc` or `~/.bashrc`) to make them permanent — the commands above do this automatically.
 
 Full setup: [`INSTALL.md`](./INSTALL.md)
 
