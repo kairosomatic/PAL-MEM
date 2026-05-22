@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "js-yaml": "^4.1.1",
+    "natural": "^8.1.1"
+  }
+}

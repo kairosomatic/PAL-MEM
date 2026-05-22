@@ -1,0 +1,12 @@
+node_modules/
+wings/
+quarantine/
+index/
+logs/
+sessions/
+chroma/
+archive/
+*.tgz
+*.jsonl
+_debug_*.png
+config.json
