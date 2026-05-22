@@ -121,6 +121,18 @@ claude mcp add palace ~/.palace/mcp-server.js
 palace bootstrap --json
 ```
 
+**Cloning to a different path?** Set `PALACE_HOME` so all internal paths resolve correctly:
+
+```bash
+git clone https://github.com/kairosomatic/PAL-MEM /your/path
+export PALACE_HOME=/your/path
+cd $PALACE_HOME && npm install
+claude mcp add palace $PALACE_HOME/mcp-server.js
+palace bootstrap --json
+```
+
+Add the `export` to your shell profile (`~/.zshrc` or `~/.bashrc`) to make it permanent.
+
 Full setup: [`INSTALL.md`](./INSTALL.md)
 
 ---
