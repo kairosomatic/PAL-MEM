@@ -27,6 +27,10 @@
 const fs       = require('fs');
 const path     = require('path');
 const http     = require('http');
+
+// natural@8 pulls in dotenv@17, which prints promo "tips" to stderr at config() time.
+// Silence the noise before the transitive require fires.
+process.env.DOTENV_CONFIG_QUIET ||= 'true';
 const natural  = require('natural');
 const access   = require('./palace-access.js');
 const trust    = require('./palace-trust.js');
