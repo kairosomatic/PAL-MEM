@@ -117,7 +117,10 @@ source: operator
 ```bash
 git clone https://github.com/kairosomatic/PAL-MEM ~/.palace
 cd ~/.palace && npm install
+# bash/zsh:
 echo 'export PATH="$HOME/.palace:$PATH"' >> ~/.zshrc && source ~/.zshrc
+# fish:
+fish_add_path ~/.palace
 claude mcp add palace ~/.palace/mcp-server.js
 palace bootstrap --json
 ```
@@ -128,8 +131,11 @@ palace bootstrap --json
 git clone https://github.com/kairosomatic/PAL-MEM /your/path
 export PALACE_HOME=/your/path
 cd $PALACE_HOME && npm install
+# bash/zsh:
 echo "export PALACE_HOME=$PALACE_HOME" >> ~/.zshrc
 echo 'export PATH="$PALACE_HOME:$PATH"' >> ~/.zshrc && source ~/.zshrc
+# fish:
+set -Ux PALACE_HOME /your/path && fish_add_path /your/path
 claude mcp add palace $PALACE_HOME/mcp-server.js
 palace bootstrap --json
 ```
